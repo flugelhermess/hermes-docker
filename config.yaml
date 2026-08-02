@@ -1,0 +1,6 @@
+version: 1
+
+telegram:
+  mode: webhook
+  webhook:
+    url: https://hermes-agent-production-2052.up.railway.app/webhook/telegram
