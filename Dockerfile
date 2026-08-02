@@ -1,12 +1,11 @@
 FROM nousresearch/hermes-agent:latest
 
-# Create data directories with proper permissions
+# Switch to root to handle permissions
 USER root
-RUN mkdir -p /data/.hermes/logs /data/.hermes/sessions /data/.hermes/cron /data/workspace
-RUN chown -R 1000:1000 /data
 
-# Switch back to non-root user
-USER 1000
+# Create data directories
+RUN mkdir -p /data/.hermes/logs /data/.hermes/sessions /data/.hermes/cron /data/workspace && \
+    chmod -R 777 /data
 
 # Override entrypoint to run gateway mode
 ENTRYPOINT ["hermes"]
