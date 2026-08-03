@@ -14,6 +14,9 @@ OPENAI_API_KEY=${OPENAI_API_KEY:-}
 OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
 TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
 TELEGRAM_ALLOWED_USERS=${TELEGRAM_ALLOWED_USERS:-}
+TELEGRAM_MODE=webhook
+HERMES_ACCEPT_HOOKS=1
+HERMES_AUTO_UPDATE=0
 EOF
 
 # Create config
@@ -25,9 +28,16 @@ terminal:
 compression:
   enabled: true
   threshold: 0.85
-telegram:
-  mode: webhook
+cron:
+  enabled: false
+kanban:
+  dispatch_in_gateway: false
 EOF
 
-echo "[entrypoint] Starting Hermes gateway..."
+# Clear any stale cron state
+rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
+rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
+rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
+
+echo "[entrypoint] Starting Hermes gateway (clean)..."
 exec hermes gateway run
