@@ -23,14 +23,14 @@ HERMES_AUTO_UPDATE=0
 HERMES_WRITE_DIR=/data/workspace
 EOF
 
-# Config — force model to 9router via openai-api provider
+# Config — use deepseek-v4-pro which supports tool calling
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  model: oc/deepseek-v4-flash-free
+  model: nvidia/deepseek-ai/deepseek-v4-pro
 auxiliary_model:
   provider: openai-api
-  model: oc/deepseek-v4-flash-free
+  model: nvidia/deepseek-ai/deepseek-v4-flash
 terminal:
   backend: local
   cwd: /data/workspace
@@ -57,8 +57,6 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: openai-api / oc/deepseek-v4-flash-free"
-echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
-echo "[entrypoint] WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-not set}"
+echo "[entrypoint] MODEL: deepseek-v4-pro (tool calling enabled)"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
