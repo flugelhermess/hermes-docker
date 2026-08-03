@@ -27,5 +27,13 @@ compression:
 EOF
 fi
 
-echo "[entrypoint] Starting Hermes dashboard (insecure) + auth proxy..."
+echo "[entrypoint] Starting Hermes gateway..."
+hermes gateway run &
+sleep 3
+
+echo "[entrypoint] Starting Hermes dashboard..."
+hermes dashboard --host 127.0.0.1 --port 9119 --no-open --insecure &
+sleep 3
+
+echo "[entrypoint] Starting auth proxy..."
 exec python /auth_proxy.py
