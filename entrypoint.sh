@@ -22,7 +22,13 @@ HERMES_AUTO_UPDATE=0
 HERMES_WRITE_DIR=/data/workspace
 EOF
 
-cat > "${HERMES_HOME}/config.yaml" <<'EOF'
+cat > "${HERMES_HOME}/config.yaml" <<EOF
+model:
+  provider: openai-api
+  model: ${MODEL:-oc/deepseek-v4-flash-free}
+auxiliary_model:
+  provider: openai-api
+  model: ${MODEL:-oc/deepseek-v4-flash-free}
 terminal:
   backend: local
   cwd: /data/workspace
@@ -47,6 +53,7 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL=${MODEL:-not set} | BASE_URL=${OPENAI_BASE_URL:-not set}"
+echo "[entrypoint] MODEL: ${MODEL:-oc/deepseek-v4-flash-free}"
+echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
