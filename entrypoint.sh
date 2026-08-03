@@ -7,7 +7,6 @@ export HOME="${HOME:-/data}"
 mkdir -p "${HERMES_HOME}" "${HERMES_HOME}/logs" "${HERMES_HOME}/sessions" "${HERMES_HOME}/cron" "${HERMES_HOME}/pairing" "/data/workspace"
 chmod -R 777 "${HERMES_HOME}" "/data/workspace"
 
-# Write .env
 cat > "${HERMES_HOME}/.env" <<EOF
 HERMES_HOME=${HERMES_HOME}
 OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -23,14 +22,7 @@ HERMES_AUTO_UPDATE=0
 HERMES_WRITE_DIR=/data/workspace
 EOF
 
-# Config — use deepseek-v4-pro which supports tool calling
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
-model:
-  provider: openai-api
-  model: nvidia/deepseek-ai/deepseek-v4-pro
-auxiliary_model:
-  provider: openai-api
-  model: nvidia/deepseek-ai/deepseek-v4-flash
 terminal:
   backend: local
   cwd: /data/workspace
@@ -44,7 +36,6 @@ kanban:
   dispatch_in_gateway: false
 EOF
 
-# Git config
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper store
   echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
@@ -52,11 +43,10 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global user.email "bot2@hermes.local"
 fi
 
-# Clean stale state
 rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: deepseek-v4-pro (tool calling enabled)"
+echo "[entrypoint] MODEL=${MODEL:-not set} | BASE_URL=${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
