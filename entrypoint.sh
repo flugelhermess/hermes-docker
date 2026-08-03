@@ -12,10 +12,9 @@ cat > "${HERMES_HOME}/.env" <<EOF
 HERMES_HOME=${HERMES_HOME}
 OPENAI_API_KEY=${OPENAI_API_KEY:-}
 OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
-HERMES_DASHBOARD_BASIC_AUTH=admin:alireza1404
 EOF
 
-# Create config
+# Create config with password hash
 cat > "${HERMES_HOME}/config.yaml" <<EOF
 terminal:
   backend: local
@@ -27,7 +26,8 @@ compression:
 dashboard:
   basic_auth:
     enabled: true
-    password: alireza1404
+    username: admin
+    password_hash: "scrypt\$16384\$8\$1\$8VvB967Y6cuABufgYdBXcg==\$ND0Zi95lDsVdmU9KaOlScK7Xbg+0J+2OMl2qpFxc8T4="
 EOF
 
 # Enable basic auth plugin
