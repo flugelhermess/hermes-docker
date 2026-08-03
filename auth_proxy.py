@@ -1,20 +1,10 @@
 #!/usr/bin/env python3
-"""Auth proxy for Hermes dashboard on Railway."""
-import os, sys, subprocess, time
+"""Simple reverse proxy for Hermes dashboard."""
+import os, sys
 import http.server, http.client
 
 PORT = int(os.environ.get("PORT", 8080))
 DASH_PORT = 9119
-
-# Start dashboard with --insecure (no auth providers installed)
-print(f"[proxy] Starting hermes dashboard --insecure on port {DASH_PORT}...")
-dash = subprocess.Popen(
-    ["hermes", "dashboard", "--host", "127.0.0.1", "--port", str(DASH_PORT), "--no-open", "--insecure"],
-    stdout=subprocess.PIPE, stderr=subprocess.PIPE
-)
-
-time.sleep(5)
-print(f"[proxy] Dashboard started (pid {dash.pid})")
 
 class ProxyHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self): self._proxy("GET")
@@ -49,7 +39,4 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 
 server = http.server.HTTPServer(("0.0.0.0", PORT), ProxyHandler)
 print(f"[proxy] Listening on 0.0.0.0:{PORT} -> 127.0.0.1:{DASH_PORT}")
-try:
-    server.serve_forever()
-except KeyboardInterrupt:
-    dash.terminate()
+server.serve_forever()
