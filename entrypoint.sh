@@ -20,10 +20,17 @@ TELEGRAM_WEBHOOK_PORT=${TELEGRAM_WEBHOOK_PORT:-8080}
 GITHUB_TOKEN=${GITHUB_TOKEN:-}
 HERMES_ACCEPT_HOOKS=1
 HERMES_AUTO_UPDATE=0
+HERMES_WRITE_DIR=/data/workspace
 EOF
 
-# Config
-cat > "${HERMES_HOME}/config.yaml" <<EOF
+# Config — force model to 9router via openai-api provider
+cat > "${HERMES_HOME}/config.yaml" <<'EOF'
+model:
+  provider: openai-api
+  model: oc/deepseek-v4-flash-free
+auxiliary_model:
+  provider: openai-api
+  model: oc/deepseek-v4-flash-free
 terminal:
   backend: local
   cwd: /data/workspace
@@ -37,7 +44,7 @@ kanban:
   dispatch_in_gateway: false
 EOF
 
-# Git config for bot2
+# Git config
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper store
   echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
@@ -50,7 +57,8 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL:-not set}"
-echo "[entrypoint] GITHUB_TOKEN=${GITHUB_TOKEN:+SET}"
+echo "[entrypoint] MODEL: openai-api / oc/deepseek-v4-flash-free"
+echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
+echo "[entrypoint] WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-not set}"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
