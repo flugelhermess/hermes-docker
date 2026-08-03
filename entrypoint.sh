@@ -22,13 +22,13 @@ HERMES_AUTO_UPDATE=0
 HERMES_WRITE_DIR=/data/workspace
 EOF
 
-cat > "${HERMES_HOME}/config.yaml" <<EOF
+cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  model: ${MODEL:-oc/deepseek-v4-flash-free}
+  name: oc/deepseek-v4-flash-free
 auxiliary_model:
   provider: openai-api
-  model: ${MODEL:-oc/deepseek-v4-flash-free}
+  name: oc/deepseek-v4-flash-free
 terminal:
   backend: local
   cwd: /data/workspace
@@ -42,6 +42,26 @@ kanban:
   dispatch_in_gateway: false
 EOF
 
+# Kill all model state caches
+rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
+rm -f "${HERMES_HOME}/model_state.json" 2>/dev/null || true
+rm -f "${HERMES_HOME}/.model" 2>/dev/null || true
+
+# Remove ONLY model-related entries from state.db (not the whole DB)
+python3 -c "
+import sqlite3, os
+db = os.path.expanduser('${HERMES_HOME}/state.db')
+if os.path.exists(db):
+    conn = sqlite3.connect(db)
+    try:
+        conn.execute(\"DELETE FROM kv WHERE key LIKE '%model%' OR key LIKE '%provider%'\")
+        conn.commit()
+        print('Cleared model state from state.db')
+    except:
+        pass
+    conn.close()
+" 2>/dev/null || true
+
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper store
   echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
@@ -53,7 +73,6 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: ${MODEL:-oc/deepseek-v4-flash-free}"
-echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
+echo "[entrypoint] MODEL: oc/deepseek-v4-flash-free (fresh start, no cache)"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
