@@ -12,8 +12,6 @@ cat > "${HERMES_HOME}/.env" <<EOF
 HERMES_HOME=${HERMES_HOME}
 OPENAI_API_KEY=${OPENAI_API_KEY:-}
 OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
-DASHBOARD_USER=${DASHBOARD_USER:-admin}
-DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:-alireza1404}
 EOF
 
 # Create config
@@ -29,5 +27,5 @@ compression:
 EOF
 fi
 
-echo "[entrypoint] Starting Hermes dashboard + auth proxy..."
+echo "[entrypoint] Starting Hermes dashboard (insecure) + auth proxy..."
 exec python /auth_proxy.py
