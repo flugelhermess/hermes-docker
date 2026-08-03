@@ -12,10 +12,10 @@ cat > "${HERMES_HOME}/.env" <<EOF
 HERMES_HOME=${HERMES_HOME}
 OPENAI_API_KEY=${OPENAI_API_KEY:-}
 OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+HERMES_DASHBOARD_BASIC_AUTH=admin:alireza1404
 EOF
 
-# Create config
-if [ ! -f "${HERMES_HOME}/config.yaml" ]; then
+# Create config with basic auth
 cat > "${HERMES_HOME}/config.yaml" <<EOF
 terminal:
   backend: local
@@ -24,16 +24,20 @@ terminal:
 compression:
   enabled: true
   threshold: 0.85
+dashboard:
+  basic_auth:
+    enabled: true
+    password: alireza1404
 EOF
-fi
 
-echo "[entrypoint] Starting Hermes gateway..."
-hermes gateway run &
-sleep 3
+# Enable the basic auth plugin
+hermes plugins enable basic 2>/dev/null || true
 
 echo "[entrypoint] Starting Hermes dashboard..."
-hermes dashboard --host 127.0.0.1 --port 9119 --no-open --insecure &
-sleep 3
+
+# Start dashboard on 9119
+hermes dashboard --host 127.0.0.1 --port 9119 --no-open &
+sleep 5
 
 echo "[entrypoint] Starting auth proxy..."
 exec python /auth_proxy.py
