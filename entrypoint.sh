@@ -15,7 +15,7 @@ OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
 HERMES_DASHBOARD_BASIC_AUTH=admin:alireza1404
 EOF
 
-# Create config with basic auth
+# Create config
 cat > "${HERMES_HOME}/config.yaml" <<EOF
 terminal:
   backend: local
@@ -30,14 +30,8 @@ dashboard:
     password: alireza1404
 EOF
 
-# Enable the basic auth plugin
+# Enable basic auth plugin
 hermes plugins enable basic 2>/dev/null || true
 
-echo "[entrypoint] Starting Hermes dashboard..."
-
-# Start dashboard on 9119
-hermes dashboard --host 127.0.0.1 --port 9119 --no-open &
-sleep 5
-
-echo "[entrypoint] Starting auth proxy..."
-exec python /auth_proxy.py
+echo "[entrypoint] Starting Hermes dashboard on PORT..."
+exec hermes dashboard --host 0.0.0.0 --port "${PORT:-8080}" --no-open
