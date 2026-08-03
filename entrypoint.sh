@@ -42,8 +42,9 @@ kanban:
   dispatch_in_gateway: false
 EOF
 
-# Force model via hermes CLI
-hermes model set openai-api oc/deepseek-v4-flash-free 2>&1 || echo "[entrypoint] model set failed, continuing..."
+# Wipe cached model state — force config.yaml to be used
+rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
+rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper store
@@ -56,6 +57,6 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: oc/deepseek-v4-flash-free"
+echo "[entrypoint] MODEL: oc/deepseek-v4-flash-free (fresh state.db)"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
