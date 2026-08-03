@@ -4,27 +4,30 @@ set -euo pipefail
 export HERMES_HOME="${HERMES_HOME:-/data/.hermes}"
 export HOME="${HOME:-/data}"
 
-ENV_FILE="${HERMES_HOME}/.env"
-
 mkdir -p "${HERMES_HOME}" "${HERMES_HOME}/logs" "${HERMES_HOME}/sessions" "${HERMES_HOME}/cron" "${HERMES_HOME}/pairing" "/data/workspace"
 chmod -R 777 "${HERMES_HOME}" "/data/workspace"
 
-# Write .env with webhook
-cat > "$ENV_FILE" <<EOF
+# Write .env
+cat > "${HERMES_HOME}/.env" <<EOF
 HERMES_HOME=${HERMES_HOME}
-TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-TELEGRAM_ALLOWED_USERS=${TELEGRAM_ALLOWED_USERS:-}
 OPENAI_API_KEY=${OPENAI_API_KEY:-}
 OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
-TELEGRAM_MODE=webhook
-TELEGRAM_WEBHOOK_URL=https://hermes-agent-production-82f6.up.railway.app/webhook/telegram
-TELEGRAM_WEBHOOK_SECRET=42e42c0fee1839cc35c0cdc16e72c2c84f9f617d4537081b86bdde8bf747d4da
-TELEGRAM_WEBHOOK_PORT=8080
+DASHBOARD_USER=${DASHBOARD_USER:-admin}
+DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:-alireza1404}
 EOF
 
-hermes config set telegram.mode webhook
-hermes config set telegram.webhook.url https://hermes-agent-production-82f6.up.railway.app/webhook/telegram
-hermes config set telegram.webhook.secret 42e42c0fee1839cc35c0cdc16e72c2c84f9f617d4537081b86bdde8bf747d4da
+# Create config
+if [ ! -f "${HERMES_HOME}/config.yaml" ]; then
+cat > "${HERMES_HOME}/config.yaml" <<EOF
+terminal:
+  backend: local
+  cwd: /data/workspace
+  timeout: 180
+compression:
+  enabled: true
+  threshold: 0.85
+EOF
+fi
 
-echo "[entrypoint] Starting Hermes gateway..."
-exec hermes gateway
+echo "[entrypoint] Starting Hermes dashboard + auth proxy..."
+exec python /auth_proxy.py
