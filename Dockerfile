@@ -1,8 +1,9 @@
-FROM nousresearch/hermes-agent:latest
+FROM python:3.11-slim
 USER root
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY git-askpass.sh /app/git-askpass.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh /app/git-askpass.sh
+RUN pip install requests
+COPY bot2_agent.py /app/bot2_agent.py
+COPY entrypoint_simple.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 ENV PORT=8080
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
