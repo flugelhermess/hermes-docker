@@ -62,9 +62,14 @@ EOF
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
-# Git credentials — write to all possible home dirs
+# Git credentials — write .git-credentials to ALL possible home dirs
+# The GITHUB_TOKEN env var is set on Railway — no hardcoded tokens here
 for H in "${HOME}" "/root" "/data" "/app" "/home" "${HERMES_HOME}"; do
   mkdir -p "$H" 2>/dev/null || true
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
+    echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > "$H/.git-credentials" 2>/dev/null || true
+    chmod 600 "$H/.git-credentials" 2>/dev/null || true
+  fi
 done
 
 # Make git-askpass executable
