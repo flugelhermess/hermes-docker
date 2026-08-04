@@ -35,10 +35,10 @@ export GIT_CONFIG_GLOBAL="${HERMES_HOME}/.gitconfig"
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  name: hermes.new
+  name: glm5.2
 auxiliary_model:
   provider: openai-api
-  name: hermes.new
+  name: glm5.2
 terminal:
   backend: local
   cwd: /data/workspace
@@ -70,7 +70,7 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: hermes.new"
+echo "[entrypoint] MODEL: glm5.2"
 echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] APPROVALS: off"
 echo "[entrypoint] Starting Hermes gateway..."
