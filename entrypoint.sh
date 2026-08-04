@@ -20,11 +20,9 @@ GITHUB_TOKEN=${GITHUB_TOKEN:-}
 HERMES_ACCEPT_HOOKS=1
 HERMES_AUTO_UPDATE=0
 HERMES_WRITE_DIR=/data/workspace
-GIT_ASKPASS=/app/git-askpass.sh
 GIT_TERMINAL_PROMPT=0
 EOF
 
-# Write git config to a writable location (HOME, not /data root)
 cat > "${HERMES_HOME}/.gitconfig" <<'GITCFG'
 [user]
   name = Hermes Bot2
@@ -32,16 +30,15 @@ cat > "${HERMES_HOME}/.gitconfig" <<'GITCFG'
 [credential]
   helper = store
 GITCFG
-
 export GIT_CONFIG_GLOBAL="${HERMES_HOME}/.gitconfig"
 
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  name: oc/deepseek-v4-flash-free
+  name: hermes.new
 auxiliary_model:
   provider: openai-api
-  name: oc/deepseek-v4-flash-free
+  name: hermes.new
 terminal:
   backend: local
   cwd: /data/workspace
@@ -58,12 +55,9 @@ approvals:
   cron_mode: approve
 EOF
 
-# Wipe cached model state
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
-# Git credentials — write .git-credentials to ALL possible home dirs
-# The GITHUB_TOKEN env var is set on Railway — no hardcoded tokens here
 for H in "${HOME}" "/root" "/data" "/app" "/home" "${HERMES_HOME}"; do
   mkdir -p "$H" 2>/dev/null || true
   if [ -n "${GITHUB_TOKEN:-}" ]; then
@@ -72,16 +66,12 @@ for H in "${HOME}" "/root" "/data" "/app" "/home" "${HERMES_HOME}"; do
   fi
 done
 
-# Make git-askpass executable
-chmod +x /app/git-askpass.sh 2>/dev/null || true
-
 rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: deepseek-v4-flash-free"
-echo "[entrypoint] GIT_CONFIG_GLOBAL: ${GIT_CONFIG_GLOBAL}"
-echo "[entrypoint] APPROVALS: off (yolo mode)"
-echo "[entrypoint] GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
+echo "[entrypoint] MODEL: hermes.new"
+echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
+echo "[entrypoint] APPROVALS: off"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
