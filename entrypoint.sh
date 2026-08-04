@@ -107,5 +107,5 @@ platform_toolsets:
 YAMLEOF
 echo "[entrypoint] config.yaml written with platform_toolsets restricted to terminal+file"
 
-echo "[entrypoint] Starting Hermes gateway..."
-exec hermes gateway run
+echo "[entrypoint] Starting Minimal Harness (Python)..."
+exec python3 /app/bot2_harness.py
