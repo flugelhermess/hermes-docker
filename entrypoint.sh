@@ -49,10 +49,16 @@ rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
 if [ -n "${GITHUB_TOKEN:-}" ]; then
+  # Write credentials to multiple locations to cover different HOME paths
+  for H in "${HOME}" "/root" "/data"; do
+    mkdir -p "$H" 2>/dev/null || true
+    echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > "$H/.git-credentials"
+    chmod 600 "$H/.git-credentials" 2>/dev/null || true
+  done
   git config --global credential.helper store
-  echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > "${HOME}/.git-credentials"
   git config --global user.name "Hermes Bot2"
   git config --global user.email "bot2@hermes.local"
+  echo "[entrypoint] Git credentials configured for all paths"
 fi
 
 rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
