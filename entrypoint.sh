@@ -22,6 +22,8 @@ HERMES_AUTO_UPDATE=0
 HERMES_AUTO_APPROVE=1
 HERMES_YOLO=1
 HERMES_WRITE_DIR=/data/workspace
+GIT_ASKPASS=/app/git-askpass.sh
+GIT_TERMINAL_PROMPT=0
 EOF
 
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
@@ -48,25 +50,30 @@ EOF
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
-if [ -n "${GITHUB_TOKEN:-}" ]; then
-  # Write credentials to multiple locations to cover different HOME paths
-  for H in "${HOME}" "/root" "/data"; do
-    mkdir -p "$H" 2>/dev/null || true
-    echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > "$H/.git-credentials"
-    chmod 600 "$H/.git-credentials" 2>/dev/null || true
-  done
-  git config --global credential.helper store
-  git config --global user.name "Hermes Bot2"
-  git config --global user.email "bot2@hermes.local"
-  echo "[entrypoint] Git credentials configured for all paths"
-fi
+# Git credentials — write to ALL possible home dirs (use askpass for actual auth)
+for H in "${HOME}" "/root" "/data" "/app" "/home"; do
+  mkdir -p "$H" 2>/dev/null || true
+done
+
+# Git config globally
+export GIT_CONFIG_GLOBAL="/data/.gitconfig"
+cat > "${GIT_CONFIG_GLOBAL}" <<GITCFG
+[user]
+  name = Hermes Bot2
+  email = bot2@hermes.local
+[credential]
+  helper = store
+GITCFG
+
+# Make git-askpass executable
+chmod +x /app/git-askpass.sh 2>/dev/null || true
 
 rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
 echo "[entrypoint] MODEL: hermes.new on b956"
-echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
+echo "[entrypoint] GIT_CONFIG_GLOBAL: ${GIT_CONFIG_GLOBAL}"
 echo "[entrypoint] GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
