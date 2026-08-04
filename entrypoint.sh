@@ -25,10 +25,10 @@ EOF
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  name: oc/deepseek-v4-flash-free
+  name: hermes.new
 auxiliary_model:
   provider: openai-api
-  name: oc/deepseek-v4-flash-free
+  name: hermes.new
 terminal:
   backend: local
   cwd: /data/workspace
@@ -46,20 +46,19 @@ EOF
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/models_dev_cache.json" 2>/dev/null || true
 
-# Git credentials — use HOME, not ~
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper store
   echo "https://flugelhermess:${GITHUB_TOKEN}@github.com" > "${HOME}/.git-credentials"
   git config --global user.name "Hermes Bot2"
   git config --global user.email "bot2@hermes.local"
-  echo "[entrypoint] Git credentials configured"
 fi
 
 rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: oc/deepseek-v4-flash-free"
+echo "[entrypoint] MODEL: hermes.new on b956"
+echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
