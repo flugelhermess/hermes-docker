@@ -23,13 +23,23 @@ def api_call(messages):
     body = json.dumps({"model": "hermes.new", "messages": messages, "tools": TOOLS, "stream": False}).encode()
     req = urllib.request.Request(f"{API_URL}/chat/completions", data=body,
         headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"})
-    resp = urllib.request.urlopen(req, timeout=90)
+    resp = urllib.request.urlopen(req, timeout=120)
     raw = resp.read().decode()
+    # Handle mixed streaming/non-streaming responses from 9router
     for line in raw.split("\n"):
         line = line.strip()
+        if line.startswith("data: "):
+            line = line[6:]
         if line.startswith("{"):
-            return json.loads(line)
-    return json.loads(raw)
+            try:
+                return json.loads(line)
+            except:
+                continue
+    # Try parsing the whole thing
+    try:
+        return json.loads(raw.split("data:")[0].strip())
+    except:
+        raise Exception(f"Could not parse response: {raw[:300]}")
 
 def run_cmd(cmd):
     try:
