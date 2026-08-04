@@ -99,7 +99,7 @@ def main():
     while True:
         try:
             req = urllib.request.Request(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates?offset={offset+1}&timeout=10")
+                f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates?offset={offset+1}&timeout=30")
             resp = urllib.request.urlopen(req, timeout=20)
             data = json.loads(resp.read())
             for u in data.get("result", []):
@@ -126,10 +126,10 @@ def main():
                 print(f"[bot2] Done: {result[:100]}", flush=True)
         except urllib.error.URLError as e:
             print(f"[bot2] Network error: {e}", flush=True)
-            time.sleep(5)
+            time.sleep(10)
         except Exception as e:
             print(f"[bot2] Error: {e}", flush=True)
-            time.sleep(5)
+            time.sleep(10)
 
 if __name__ == "__main__":
     main()
