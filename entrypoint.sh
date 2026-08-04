@@ -53,6 +53,31 @@ kanban:
 approvals:
   mode: off
   cron_mode: approve
+agent:
+  disabled_toolsets:
+    - web
+    - browser
+    - code_execution
+    - vision
+    - video
+    - image_gen
+    - video_gen
+    - x_search
+    - tts
+    - skills
+    - todo
+    - memory
+    - context_engine
+    - session_search
+    - clarify
+    - delegation
+    - cronjob
+    - homeassistant
+    - spotify
+    - discord
+    - discord_admin
+    - computer_use
+    - yuanbao
 EOF
 
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
