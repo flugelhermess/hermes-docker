@@ -29,10 +29,10 @@ EOF
 cat > "${HERMES_HOME}/config.yaml" <<'EOF'
 model:
   provider: openai-api
-  name: hermes.new
+  name: oc/deepseek-v4-flash-free
 auxiliary_model:
   provider: openai-api
-  name: hermes.new
+  name: oc/deepseek-v4-flash-free
 terminal:
   backend: local
   cwd: /data/workspace
@@ -72,7 +72,7 @@ rm -f "${HERMES_HOME}/cron/executions.db" 2>/dev/null || true
 rm -f "${HERMES_HOME}/cron/jobs.json" 2>/dev/null || true
 rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 
-echo "[entrypoint] MODEL: hermes.new on b956"
+echo "[entrypoint] MODEL: deepseek-v4-flash-free on b956"
 echo "[entrypoint] GIT_CONFIG_GLOBAL: ${GIT_CONFIG_GLOBAL}"
 echo "[entrypoint] GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
 echo "[entrypoint] Starting Hermes gateway..."
