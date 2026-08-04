@@ -77,5 +77,10 @@ rm -f "${HERMES_HOME}/.tick.lock" 2>/dev/null || true
 echo "[entrypoint] MODEL: hermes.new"
 echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] APPROVALS: off"
+
+# Set tool restrictions via hermes config
+hermes config set platform_toolsets.telegram "terminal,file" 2>&1 || true
+hermes config set toolsets "terminal,file" 2>&1 || true
+
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
