@@ -78,9 +78,34 @@ echo "[entrypoint] MODEL: hermes.new"
 echo "[entrypoint] BASE_URL: ${OPENAI_BASE_URL:-not set}"
 echo "[entrypoint] APPROVALS: off"
 
-# Set tool restrictions via hermes config
-hermes config set platform_toolsets.telegram "terminal,file" 2>&1 || true
-hermes config set toolsets "terminal,file" 2>&1 || true
+# Write config.yaml directly with correct YAML format
+cat > "${HERMES_HOME}/config.yaml" <<'YAMLEOF'
+model:
+  provider: openai-api
+  name: hermes.new
+auxiliary_model:
+  provider: openai-api
+  name: hermes.new
+terminal:
+  backend: local
+  cwd: /data/workspace
+  timeout: 180
+compression:
+  enabled: true
+  threshold: 0.85
+cron:
+  enabled: false
+kanban:
+  dispatch_in_gateway: false
+approvals:
+  mode: off
+  cron_mode: approve
+platform_toolsets:
+  telegram:
+    - terminal
+    - file
+YAMLEOF
+echo "[entrypoint] config.yaml written with platform_toolsets restricted to terminal+file"
 
 echo "[entrypoint] Starting Hermes gateway..."
 exec hermes gateway run
