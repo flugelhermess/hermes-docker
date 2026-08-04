@@ -53,6 +53,9 @@ kanban:
 approvals:
   mode: off
   cron_mode: approve
+toolsets:
+  - terminal
+  - file
 agent:
   disabled_toolsets:
     - web
