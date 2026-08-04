@@ -53,12 +53,10 @@ kanban:
 approvals:
   mode: off
   cron_mode: approve
-toolsets:
-  - terminal
-  - file
 platform_toolsets:
-  - terminal
-  - file
+  telegram:
+    - terminal
+    - file
 EOF
 
 rm -f "${HERMES_HOME}/state.db" 2>/dev/null || true
